@@ -1,7 +1,7 @@
 ---
 title: "Aplicación del modelo lineal general"
 author: "Vásquez V., C.R.A."
-date: "30/07/2021"
+date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 subtitle: Recuento de escarabajos en un área
 institute: InkaStats - Data Science Solutions S.A.C.
