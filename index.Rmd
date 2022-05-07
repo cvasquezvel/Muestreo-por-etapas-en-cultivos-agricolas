@@ -172,7 +172,7 @@ summary(datos.test)
 
 ### Verificación de la distribución de la variable respuesta (Recuento)
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 par(mfrow = c(1,3))
 hist(datos$Recuento,
                            main = "Datos completos",
@@ -194,7 +194,7 @@ hist(datos.test$Recuento,
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 step(object = lm(formula = Recuento ~ 1, data = datos.train),
  direction = "forward",
  scope = formula(lm(Recuento~.,data=datos)),
@@ -204,7 +204,7 @@ modelo_forward %>% summary
 
 ### AIC del modelo
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 AIC(modelo_forward)
 ```
 
@@ -215,7 +215,7 @@ AIC(modelo_forward)
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(tidyverse)
 library(broom)
 modelo_forward %>% 
@@ -232,21 +232,21 @@ modelo_forward %>%
 
 ### VIF de las variables seleccionadas
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(faraway)
 modelo_forward %>% vif
 ```
 
 ### MSE del entrenamiento
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo_forward %>% predict(newdata = data.frame(datos.train)) -> predicciones_train
 (mean((predicciones_train - datos.train$Recuento)^2) -> training_mse)
 ```
 
 ### Indicadores predictivos con la base de datos de entrenamiento
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(caret)
 postResample(predicciones_train, obs = datos.train$Recuento)
 ```
@@ -257,7 +257,7 @@ postResample(predicciones_train, obs = datos.train$Recuento)
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 step(object = lm(formula = Recuento ~ ., data = datos.train),
  direction = "backward",
  scope = list(upper = ~., lower = ~1),
@@ -267,7 +267,7 @@ modelo_backward %>% summary
 
 ### AIC del modelo
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 AIC(modelo_backward)
 ```
 
@@ -277,7 +277,7 @@ AIC(modelo_backward)
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(tidyverse)
 library(broom)
 modelo_backward %>% 
@@ -294,21 +294,21 @@ modelo_backward %>%
 
 ### VIF de las variables seleccionadas
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(faraway)
 modelo_backward %>% vif
 ```
 
 ### MSE del entrenamiento
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo_backward %>% predict(newdata = data.frame(datos.train)) -> predicciones_train
 (mean((predicciones_train - datos.train$Recuento)^2) -> training_mse)
 ```
 
 ### Indicadores predictivos con la base de datos de entrenamiento
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(caret)
 postResample(predicciones_train, obs = datos.train$Recuento)
 ```
@@ -319,7 +319,7 @@ postResample(predicciones_train, obs = datos.train$Recuento)
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 step(object = lm(formula = Recuento ~ 1, data = datos.train),
  direction = "both",
  scope = formula(lm(Recuento~.,data=datos)),
@@ -330,7 +330,7 @@ modelo_step %>% summary
 
 ### AIC del modelo
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 AIC(modelo_step)
 ```
 
@@ -341,7 +341,7 @@ AIC(modelo_step)
 
 \changefontsizes{5pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(tidyverse)
 library(broom)
 modelo_step %>% 
@@ -358,21 +358,21 @@ modelo_step %>%
 
 ### VIF de las variables seleccionadas
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(faraway)
 modelo_step %>% vif
 ```
 
 ### MSE del entrenamiento
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo_step %>% predict(newdata = data.frame(datos.train)) -> predicciones_train
 (mean((predicciones_train - datos.train$Recuento)^2) -> training_mse)
 ```
 
 ### Indicadores predictivos con la base de datos de entrenamiento
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(caret)
 postResample(predicciones_train, obs = datos.train$Recuento)
 ```
@@ -435,7 +435,7 @@ lm(Recuento ~ Altura+Temperatura, data = datos.train) %>% avPlots
 
 ### Valores predichos vs Residuos
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 <- modelo_final
 par(mfrow = c(1,1))
 plot(modelo1,which = 1)
@@ -445,28 +445,28 @@ plot(modelo1,which = 1)
 
 ### Gráfico de probabilidad normal de residuos
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 plot(modelo1,which = 2)
 ```
 ## Análisis de supuestos
 
 ### Valores predichos vs Raíz de los residuos estandarizados absolutos
  
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 plot(modelo1,which = 3)
 ```
 ## Análisis de supuestos
 
 ### Leverage vs Residuos estandarizados
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 plot(modelo1,which = 5)
 ```
 ## Análisis de supuestos
 
 ### Distancias de Cook
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 plot(modelo1,which = 4)
 ```
 
@@ -475,7 +475,7 @@ plot(modelo1,which = 4)
 
 ### Distancias de Cook vs Leverage
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 plot(modelo1,which = 6)
 ```
 
@@ -488,7 +488,7 @@ plot(modelo1,which = 6)
 
 \changefontsizes{7pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>%
   residuals() %>%
   moments::skewness()
@@ -498,7 +498,7 @@ modelo1 %>%
 
 \changefontsizes{7pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>%
   residuals() %>%
   moments::kurtosis()
@@ -519,7 +519,7 @@ $H_1:$ Los residuos estandarizados del modelo planteado no se distribuyen de for
 
 \changefontsizes{7pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>%
   rstudent %>%
   stats::shapiro.test()
@@ -547,7 +547,7 @@ $H_1:$ La variancia de los errores del modelo planteado es heterocedástica.
 
 \changefontsizes{4pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>%
   ncvTest
 
@@ -574,7 +574,7 @@ $H_1:$ Los errores del modelo planteado están autocorrelacionados.
 
 ### Prueba de hipótesis para la autocorrelación de residuos
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>% residuals() %>% TSA::acf()
 ```
 
@@ -582,7 +582,7 @@ modelo1 %>% residuals() %>% TSA::acf()
 
 ### Prueba de hipótesis para la autocorrelación de residuos
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>% residuals() -> residuales
 plot(1:nrow(datos.train),residuales, type = "l")
 ```
@@ -590,7 +590,7 @@ plot(1:nrow(datos.train),residuales, type = "l")
 
 ### Prueba de hipótesis para la autocorrelación de residuos
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>% dwtest(alternative = "two.sided")
 ```
 
@@ -600,7 +600,7 @@ modelo1 %>% dwtest(alternative = "two.sided")
 
 \changefontsizes{7pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>% car::durbinWatsonTest(alternative = "two.sided",
                             max.lag=10,
                             reps=1e3)
@@ -612,7 +612,7 @@ modelo1 %>% car::durbinWatsonTest(alternative = "two.sided",
 
 \changefontsizes{4pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 
 modelo1 %>% model.matrix -> X1
 X1 %*% solve(t(X1)%*%X1) %*% t(X1) -> H1
@@ -656,7 +656,7 @@ Para nuestro caso son considerados valores leverage los siguientes: 26, 44, 77, 
 
 \changefontsizes{4pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 round(modelo1 %>% cooks.distance(),4)
 
 data.frame(cook=(modelo1 %>% cooks.distance()),
@@ -677,7 +677,7 @@ Por otro lado, se ha detectdo que ninguna de las observaciones poseen una distan
 
 \changefontsizes{3pt}
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo1 %>% covratio() 
 3 -> k
 length(datos.train$Recuento) -> n
@@ -700,14 +700,14 @@ Las observaciones con un alto COVRATIO fueron: 17, 26, 57, 100, 102 y 123. Estas
 
 ### MSE del modelo final sobre los datos de prueba
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 modelo_step %>% predict(newdata = data.frame(datos.test)) -> predicciones_test
 (mean((predicciones_train - datos.train$Recuento)^2) -> test_mse)
 ```
 
 ### Indicadores predictivos con la base de datos de prueba
 
-```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "220px"}
+```{r, echo = F, eval=T, message=F, comment="", warning= F, fig.align='center',out.width = "800px"}
 library(caret)
 postResample(predicciones_test, obs = datos.test$Recuento)
 ```
