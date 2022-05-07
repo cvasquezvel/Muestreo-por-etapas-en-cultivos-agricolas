@@ -1,6 +1,7 @@
 --- 
-title: "YOUR TITLE HERE"
-author: "YOUR NAME HERE"
+title: "Muestreo por etapas en cultivos agrícolas"
+subtitle: "Caso aplicado en cultivo de arándano"
+author: "Christian Richard Alberto Vásquez Velasco"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
