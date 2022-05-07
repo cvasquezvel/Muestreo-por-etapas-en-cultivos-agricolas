@@ -1,12 +1,25 @@
---- 
+---
 title: "Muestreo por etapas en cultivos agrícolas"
-subtitle: "Caso aplicado en cultivo de arándano"
-author: "Christian Richard Alberto Vásquez Velasco"
+author: "Vásquez V., C.R.A."
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
+subtitle: Aplicaciones en arándano
+institute: InkaStats - Data Science Solutions S.A.C.
+classoption: aspectratio=169
+header-includes:
+- \usepackage{multicol,ragged2e,lipsum,etoolbox,scrextend,lmodern}
+
 ---
+```{=html}
+<style>
+body {
+text-align: justify}
+</style>
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(max.print = 9999,
+        scipen = 999)
+```
 
 # Introducción
-
-
-
