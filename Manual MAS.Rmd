@@ -1,0 +1,356 @@
+---
+title: "Muestreo aleatorio simple"
+author: 
+ - Mg(c). Christian Vásquez Velasco
+ - Coordinador de Proyecciones Agrícolas
+ - Operaciones agrícolas arándano - Danper Trujillo S.A.C.
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::robobook:
+    self_contained: true
+---
+
+```{=html}
+<style>
+body {
+text-align: justify}
+</style>
+```
+```{r setup, include=FALSE}
+if (!require("pacman")) {
+  install.packages("pacman")
+}
+pacman::p_unload(pacman::p_loaded(),
+  character.only = TRUE
+)
+pacman::p_load(
+  tidyverse,readxl,raster,tibble) 
+
+## Global options
+options(max.print = "300",
+        scipen = 99)
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  cache = TRUE,
+  prompt = FALSE,
+  tidy = TRUE,
+  comment = NA,
+  message = FALSE,
+  warning = FALSE
+)
+
+knitr::opts_knit$set(width = 75)
+```
+
+# MANUAL PARA EL CÁLCULO DE TAMAÑO DE MUESTRA POR UN MUESTREO ALEATORIO SIMPLE (M.A.S.).
+
+Este documento se ha elaborado para que sirva como referencia en las futuras evaluaciones del área de proyecciones para el cultivo de arándano.
+
+En el contenido de este manual se podrá observar los criterios estadísticos básicos para el cálculo del tamaño de muestra bajo la técnica de muestreo simple aleatorio.
+
+Se desarrollo como objetivo *determinar el tamaño de muestra ideal para la estimación del promedio de frutos por planta y de un coeficiente de variación bajo en la estimación del promedio*.
+
+Para lograr este objetivo se desarrollo un conjunto de códigos y los sustentos estadísticos de sus aplicaciones.
+
+Finalmente, se llegará a la determinación de un tamaño de muestra óptimo que deberá ser aplicado para optimizar los recursos del área de proyecciones agrícolas.
+
+## Carga de datos de conteo
+
+Para este manual se tomaron los registros de conteo de frutos en la campaña 2021 del cultivo de arándano en la variedad Ventura, Módulo 1, fundo Agromorín, Danper Trujillo SAC.
+
+En el cultivo de arándano se debe tener en cuenta que existen múltiples poblaciones de frutos. Esta afirmación se justifica en el sentido que existen múltiples cosechas realizadas semanalmente y cada una de ellas proviene de floraciones que aparecen en fechas diferentes. A comparación del cultivo de palto, en el cual se puede tener datos de conteo de frutos de todas las floraciones a partir de que se detenga la fase de diferenciación floral y cuajado de frutos en el cultivo.
+
+```{r}
+Arandano <- read_excel("DATA.xlsx",sheet = "DATA PROY") # Función que permite importar una hoja de excel en R
+attach(Arandano) # Función que fija un objeto de R para llamar a sus elementos
+head(Arandano) # Función que permite obtener un resumen de los datos en un data.frame
+Arandano <- Arandano %>%
+  dplyr::select(-llave3, -LLAVE2, -LLAVE) %>%
+  dplyr::mutate(`Bayas para cosecha` = `PROY_VP 50%` + PROY_CREMOSO + 
+                  `PROY_PINTON 1` + `PROY_PINTON 2` + PROY_ROSADO + PROY_GUINDA + PROY_AZUL) %>%
+  # dplyr::rename("X" = "Bayas para cosecha") %>%
+  dplyr::filter(FUNDO %in% "AGROMORIN",
+                MODULO %in% "M01",
+                VARIEDAD %in% "VENTURA")
+```
+
+## Selección de una población
+
+Se considera una población a una semana de conteo, siendo la variable más importante las bayas lista para cosecha (que están conformadas por las bayas iniciando a crema, bayas cremas y bayas maduras, que luego de unos días están listas para ser cosechadas).
+
+Para este ejercicio se tomó la semana calendario 37 del año 2021.
+
+```{r}
+MuesSem <- # Nombre que recibe el nuevo subconjunto de datos
+  Arandano %>% # Nombre del data.frame del cual se seleccionará el subconjunto
+  dplyr::filter(SEMANA %in% "37") # Funcion que permite crear un subconjunto de datos filtrando una categoría de interés
+```
+
+En primer lugar se debe definir el vector o variable de interés
+
+```{r}
+x = MuesSem$`Bayas para cosecha` #  Creo un vector llamado "x" con la información de mi variable de interés
+is.na(x) <- 0 # Convierte los valores perdidos a 0 (esto no siempre es correcto, pero para se considera esto para evitar eliminar observaciones y crear un tamaño muestral previo más bajo)
+n = length(x) # tamaño de muestra previo
+n
+N = 204009 # tamaño estimado de la población
+N
+var = var(x) # variancia del vector
+var
+sd = sd(x) # desviación estándar del vector
+sd
+alfa = c(0.1,0.05,0.025,0.01) # nivel de significancia
+alfa
+
+meanest = mean(x) # Media de la muestra preliminar
+meanest
+varest = (var/n)*(1-(n/N)) # variancia del promedio estimado
+varest
+sdest = sqrt(varest) # desviación estándar del promedio estimado
+sdest
+
+d = qt((1-(alfa/2)),n-1)*sdest # Error de la estimación de la media. Se emplea una distribución de student (t) debido a que la variancia de la población no es conocida
+d
+
+propd <-  d/meanest #Razón de error estimado en base a la media estimada
+propd
+```
+
+## Para estimar promedios cuando la variancia es conocida
+
+Para estimar la media del número de bayas cosechables por planta, es necesario calcular una muestra previa con la siguiente fórmula:
+
+$$n_0 = (t_{(α/2,n-1)}*sd_{(x)}/d)^2$$
+Luego se calcula el tamaño de muestra definitivo con la siguiente fórmula:
+
+$$n = n_0/(1+(n_0/N))$$
+Computacionalmente en R se obtiene:
+
+```{r}
+perr = c(0.1, 0.05, 0.025, 0.01) # proporción de error deseado
+d.deseado = meanest*perr # Error deseado de la estimación de la media
+d.deseado
+
+no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado[1])^2 # Tamaño de muestra preliminar con proporción de error de 0.1
+
+ndef_tol0.1 = no/(1+(no/N)) # Tamaño de muestra corregida
+ceiling(ndef_tol0.1) # Redondeo
+
+no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado[2])^2 # Tamaño de muestra preliminar con proporción de error de 0.05
+
+ndef_tol0.05 = no/(1+(no/N)) # Tamaño de muestra corregida
+ceiling(ndef_tol0.05) # Redondeo
+
+no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado[3])^2 # Tamaño de muestra preliminar con proporción de error de 0.025
+
+ndef_tol0.025 = no/(1+(no/N)) # Tamaño de muestra corregida
+ceiling(ndef_tol0.025) # Redondeo
+
+no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado[4])^2 # Tamaño de muestra preliminar con proporción de error de 0.01
+
+ndef_tol0.01 = no/(1+(no/N)) # Tamaño de muestra corregida
+ceiling(ndef_tol0.01) # Redondeo
+
+print(data.frame(`Alfa` = c(0.1,0.05,0.025,0.01),
+                 `10 % Tolerancia` = ceiling(ndef_tol0.1),
+                 `5 % Tolerancia` = ceiling(ndef_tol0.05),
+                 `2.5 % Tolerancia` = ceiling(ndef_tol0.025),
+                 `1 % Tolerancia` = ceiling(ndef_tol0.01),
+                 check.names = F))
+
+```
+
+## Tamaño de muestra en base al coeficiente de variación deseado del estimador
+
+Para estimar la media del número de bayas cosechables por planta con un coeficiente de variación controlado, es necesario calcular una muestra previa con la siguiente fórmula::
+
+$$n_0 = cv_{(x)}/cv_0$$
+Luego se calcula el tamaño de muestra definitivo con la siguiente fórmula:
+
+$$n = n_0/(1+(n_0/N))$$
+
+```{r}
+cv = cv(x)/100 # Coeficiente de variación del vector
+cv
+cvo = c(0.1, 0.05, 0.025, 0.01) # Coeficiente de variación esperado
+
+no = (cv/cvo)^2 # Tamaño de muestra preliminar
+
+ndef = no/(1+(no/N)) # Tamaño de muestra corregido
+ceiling(ndef) # Redondeo
+```
+
+```{r, include=FALSE, eval = FALSE}
+### Selección de muestra
+
+nsample = 67 # Definir el tamaño de muestra en x plantas
+muestra <- Censo[sample(nrow(Censo),nsample,F),]
+head(muestra)
+
+#Muestra sin reemplazo
+muestra2<- Censo %>%
+  sample_n(size=nsample,replace=FALSE)
+head(muestra2)
+
+#Muestra con pesos
+
+Censo$PesoMAS <- nsample/nrow(Censo) # Crea un vector de pesos
+
+muestra3<- Censo %>%
+  sample_n(size=nsample,weight=PesoMAS)
+head(muestra3)
+
+#Muestra con una proporción de casos
+propsample = 0.001 # Definir la proporción de casos para la muestra
+muestra4<- Censo %>%
+  sample_frac(propsample)
+
+head(muestra4);dim(muestra4)
+```
+
+## Conclusiones
+
+El tamaño de muestra definitivo actual aplicada para el módulo 1 en el cultivo de arándano variedad Ventura en la semana 37 del 2021 es de 67 plantas, pero, en este ejercicio se demuestra que según el método de cálculo de tamaño muestral calculado, el número de plantas muestreadas varía en base al nivel de significancia aplicado para la estimación del error de la media o del coeficiente de variación. En ese sentido, probabilísticamente, en base a algunos de los criterios más robustos del tamaño muestral, se afirma que el tamaño muestral aplicado en el cultivo de arándano fue adecuado para la semana 37.
+
+## Anexos
+
+### Tamaño de muestra para una válvula
+
+``` {r}
+MuesSemVal <- # Nombre que recibe el nuevo subconjunto de datos
+  Arandano %>% # Nombre del data.frame del cual se seleccionará el subconjunto
+  dplyr::filter(SEMANA %in% "27",
+                MODULO %in% "M01",
+                TURNO %in% "T03",
+                LOTE_COD %in% "A3") # Funcion que permite crear un subconjunto de datos filtrando una categoría de interés
+
+x = MuesSemVal$`Bayas para cosecha` #  Creo un vector llamado "x" con la información de mi variable de interés
+is.na(x) <- 0 # Convierte los valores perdidos a 0 (esto no siempre es correcto, pero para se considera esto para evitar eliminar observaciones y crear un tamaño muestral previo más bajo)
+n = length(x) # tamaño de muestra previo
+n
+N = 11004 # tamaño de la población censada
+N
+var = var(x) # variancia del vector
+var
+sd = sd(x) # desviación estándar del vector
+sd
+alfa = c(0.05) # nivel de significancia
+alfa
+
+meanest = mean(x) # Media de la muestra preliminar
+meanest
+varest = (var/n)*(1-(n/N)) # variancia del promedio estimado
+varest
+sdest = sqrt(varest) # desviación estándar del promedio estimado
+sdest
+
+d = qt((1-(alfa/2)),n-1)*sdest # Error de la estimación de la media. Se emplea una distribución de student (t) debido a que la variancia de la población no es conocida
+d
+
+propd <-  d/meanest
+propd
+
+perr = c(0.1,0.05,0.025,0.01) # proporción de error deseado
+d.deseado = meanest*perr # Error deseado de la estimación de la media
+d.deseado
+
+no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado)^2 # Tamaño de muestra preliminar con proporción de error de 0.1
+
+ndef = no/(1+(no/N)) # Tamaño de muestra corregida
+ceiling(ndef) # Redondeo
+
+cv = cv(x)/100 # Coeficiente de variación del vector
+cv
+cvo = c(c(0.1,0.05,0.025,0.01)) # Coeficiente de variación esperado
+
+no = (cv/cvo)^2 # Tamaño de muestra preliminar
+
+ndef = no/(1+(no/N)) # Tamaño de muestra corregido
+ceiling(ndef) # Redondeo
+
+```
+
+Con un nivel de significancia de 0.1, al evaluar la muestra de un lote (M01T03A3) con los datos registrados en la semana calendario 27, se puede concluir que a nivel de esa lote y en esa semana se debe tomar una muestra de 330 plantas para tener una estimación del promedio de bayas cosechables por planta con una proporción de error deseado de 5 %.
+
+### Cálculo de los tamaños de muestra semanales con datos históricos de la campaña 2021 del cultivo de arándano
+
+
+``` {r tidy = TRUE}
+rm(list = ls())
+
+Arandano <- read_excel("DATA.xlsx",sheet = "DATA PROY") # Función que permite importar una hoja de excel en R
+attach(Arandano) # Función que fija un objeto de R para llamar a sus elementos
+head(Arandano) # Función que permite obtener un resumen de los datos en un data.frame
+Arandano <- Arandano %>%
+  dplyr::select(-llave3, -LLAVE2, -LLAVE) %>%
+  dplyr::mutate(`Bayas para cosecha` = `PROY_VP 50%` + PROY_CREMOSO + 
+                  `PROY_PINTON 1` + `PROY_PINTON 2` + PROY_ROSADO + PROY_GUINDA + PROY_AZUL) %>%
+  # dplyr::rename("X" = "Bayas para cosecha") %>%
+  dplyr::filter(FUNDO %in% "AGROMORIN",
+                MODULO %in% "M01",
+                VARIEDAD %in% "VENTURA")
+semana = as.vector(levels(as.factor(Arandano$`SEMANA`)))
+
+MuesSem1 <- Arandano %>%
+  dplyr::filter(SEMANA %in% semana) %>%
+  split(Arandano$SEMANA) %>%
+  enframe
+
+# Se creó una función que permitió elegir el tamaño de muestra por cada semana
+ncal <- function(datos, # data frame con los datos históricos
+                 N, # data frame con la información del censo
+                 alfa, # nivel de significancia
+                 prop.err){ # proporción de error para la estimación de la media
+  r <- nrow(datos)
+  ndef = c()
+  for (i in 1:r) {
+    x = datos[[2]][[i]]$`Bayas para cosecha`
+    n = length(x) # tamaño de muestra previo
+    N = N # tamaño de la población censada
+    var = var(x) # variancia del vector
+    sd = sd(x) # desviación estándar del vector
+    meanest = mean(x)
+    d.deseado = meanest*prop.err # Error deseado de la estimación de la media
+    no = ((qt((1-(alfa/2)),n-1)*sd)/d.deseado)^2 # Tamaño de muestra preliminar con proporción de error de 0.1
+    ndef[i] = round(no/(1+(no/N)),0) # Tamaño de muestra corregida
+  }
+  return(ndef)
+}
+
+ncal1 <- ncal(MuesSem1, 204009, 0.05, 0.1)
+ncal2 <- ncal(MuesSem1, 204009, 0.05, 0.05)
+ncal3 <- ncal(MuesSem1, 204009, 0.05, 0.025)
+ncal4 <- ncal(MuesSem1, 204009, 0.05, 0.01)
+ncal5 <- ncal(MuesSem1, 204009, 0.05, 0.005)
+ncal6 <- ncal(MuesSem1, 204009, 0.05, 0.001)
+
+MAS <- data.frame(x = semana,
+                  y = ncal2)
+plot(MAS$x,MAS$y, type = "h",
+     xlab = "Semana",
+     ylab = "Tamaño de muestra",
+     main = "Tamaño de muestra semanal con
+0.05 de proporción de error")
+
+boxplot(MAS$y)
+median(MAS$y)
+quantile(MAS$y,0.75)
+```
+
+
+``` {r}
+medias <- Arandano %>%
+  group_by(SEMANA) %>%
+  summarise_if(is.numeric, mean, na.rm = T)
+
+plot(medias$SEMANA,medias$`Bayas para cosecha`, type = "h",
+     xlab = "Semana",
+     ylab = "Número de frutos por planta")
+
+```
+Se realizó el anterior diagrama de cajas, dónde se puede observar que existen al menos cuatro valores atípicos extremos.
+
+La mediana de los tamaños de muestra calculados con un nivel de confianza de 0.05 y una proporción de error de 0.05 fue de 389 muestras, y el cuantil 75 de 544 muestras.
+
+
